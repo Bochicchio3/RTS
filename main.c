@@ -24,7 +24,7 @@ int main() {
 
          draw_task();
 
-         pthread_create (&planet,NULL, task, NULL);
+         // pthread_create (&planet,NULL, task, NULL);
         // IMAGE_ACQUISITION();
 
         // if (a==0)

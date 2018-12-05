@@ -40,7 +40,7 @@ void  initialize_graphic_and_keyboard(){
 
     font = al_create_builtin_font();
     must_init(font, "font");
-    // ptask_init(SCHED_FIFO);
+
     al_start_timer(timer);
 
 
@@ -95,6 +95,7 @@ void initialize_planet_and_other_stuff(){
   thispianeta->dy =3;
   thispianeta->type = 0;
   memset(key, 0, sizeof(key));
+  //se possibile evitare??
   telescope_selector=1;
 for (int i = 0; i < 6; i++) {
   telescope[i].init=false;
@@ -377,192 +378,210 @@ void Get_User_Input(){
 }
 
 
-//------------------------------------------------------------------------------
-// TIME_ADD_MS: adds a value ms expressed in milliseconds to the time variable
-// pointed by t
-//------------------------------------------------------------------------------
-
-void time_add_ms(struct timespec *t, int ms){
-
-    t->tv_sec += ms/1000;
-    t->tv_nsec += (ms%1000)*1000000;
-
-    if (t->tv_nsec > 1000000000){
-        t->tv_nsec -= 1000000000;
-        t->tv_sec += 1;
-    }
-}
-
-//------------------------------------------------------------------------------
-// WAIT_FOR_PERIOD:suspends the calling thread until the next activation and,
-// when awaken,updates activation time
-//------------------------------------------------------------------------------
-
-void wait_for_period (struct task_par *tp){
-
-    clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME,&(tp->at), NULL);
-    time_add_ms(&(tp->at), tp->period);
-    time_add_ms(&(tp->dl), tp->period);
-}
-
-
-//------------------------------------------------------------------------------
-// SET_PERIOD: reads the current time and computes the next activation time and
-// the absolute deadline of the task
-//------------------------------------------------------------------------------
-
-void set_period(struct task_par *tp){
-
-struct timespec t;
-
-    clock_gettime(CLOCK_MONOTONIC, &t);
-    time_copy(&(tp->at), t);
-    time_copy(&(tp->dl), t);
-    time_add_ms(&(tp->at), tp->period);
-    time_add_ms(&(tp->dl), tp->deadline);
-}
-
-//------------------------------------------------------------------------------
-// TIME_COPY: copies a source time variable ts in a destination variable
-// pointed by td
-//------------------------------------------------------------------------------
-
-void time_copy(struct timespec *td, struct timespec ts){
-
-    td->tv_sec = ts.tv_sec;
-    td->tv_nsec = ts.tv_nsec;
-}
-
-//------------------------------------------------------------------------------
-// DEADLINE_MISS: increments the value of dmiss when e deadline is missed
-//------------------------------------------------------------------------------
-
-int deadline_miss(struct task_par *tp){
-
-struct timespec now;
-
-    clock_gettime(CLOCK_MONOTONIC, &now);
-
-    if (time_cmp(now, tp->dl)>0) {
-        tp->dmiss++;
-        return 1;
-    }
-    return 0;
-}
-
-//------------------------------------------------------------------------------
-// TIME_CMP: compares two time variables t1 and t2 and returns 0 if
-// they are equal, 1 if t1>t2, -1 if t1<t2
-//------------------------------------------------------------------------------
-
-int time_cmp(struct timespec t1, struct timespec t2){
-
-    if (t1.tv_sec > t2.tv_sec) return 1;
-    if (t1.tv_sec < t2.tv_sec) return -1;
-    if (t1.tv_nsec > t2.tv_nsec) return 1;
-    if (t1.tv_nsec < t2.tv_nsec) return -1;
-    return 0;
-}
-
-
+// //------------------------------------------------------------------------------
+// // TIME_ADD_MS: adds a value ms expressed in milliseconds to the time variable
+// // pointed by t
+// //------------------------------------------------------------------------------
+//
+// void time_add_ms(struct timespec *t, int ms){
+//
+//     t->tv_sec += ms/1000;
+//     t->tv_nsec += (ms%1000)*1000000;
+//
+//     if (t->tv_nsec > 1000000000){
+//         t->tv_nsec -= 1000000000;
+//         t->tv_sec += 1;
+//     }
+// }
+//
+// //------------------------------------------------------------------------------
+// // WAIT_FOR_PERIOD:suspends the calling thread until the next activation and,
+// // when awaken,updates activation time
+// //------------------------------------------------------------------------------
+//
+// void wait_for_period (struct task_par *tp){
+//
+//     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME,&(tp->at), NULL);
+//     time_add_ms(&(tp->at), tp->period);
+//     time_add_ms(&(tp->dl), tp->period);
+// }
+//
+//
+// //------------------------------------------------------------------------------
+// // SET_PERIOD: reads the current time and computes the next activation time and
+// // the absolute deadline of the task
+// //------------------------------------------------------------------------------
+//
+// void set_period(struct task_par *tp){
+//
+// struct timespec t;
+//
+//     clock_gettime(CLOCK_MONOTONIC, &t);
+//     time_copy(&(tp->at), t);
+//     time_copy(&(tp->dl), t);
+//     time_add_ms(&(tp->at), tp->period);
+//     time_add_ms(&(tp->dl), tp->deadline);
+// }
+//
+// //------------------------------------------------------------------------------
+// // TIME_COPY: copies a source time variable ts in a destination variable
+// // pointed by td
+// //------------------------------------------------------------------------------
+//
+// void time_copy(struct timespec *td, struct timespec ts){
+//
+//     td->tv_sec = ts.tv_sec;
+//     td->tv_nsec = ts.tv_nsec;
+// }
+//
+// //------------------------------------------------------------------------------
+// // DEADLINE_MISS: increments the value of dmiss when e deadline is missed
+// //------------------------------------------------------------------------------
+//
+// int deadline_miss(struct task_par *tp){
+//
+// struct timespec now;
+//
+//     clock_gettime(CLOCK_MONOTONIC, &now);
+//
+//     if (time_cmp(now, tp->dl)>0) {
+//         tp->dmiss++;
+//         return 1;
+//     }
+//     return 0;
+// }
+//
+// //------------------------------------------------------------------------------
+// // TIME_CMP: compares two time variables t1 and t2 and returns 0 if
+// // they are equal, 1 if t1>t2, -1 if t1<t2
+// //------------------------------------------------------------------------------
+//
+// int time_cmp(struct timespec t1, struct timespec t2){
+//
+//     if (t1.tv_sec > t2.tv_sec) return 1;
+//     if (t1.tv_sec < t2.tv_sec) return -1;
+//     if (t1.tv_nsec > t2.tv_nsec) return 1;
+//     if (t1.tv_nsec < t2.tv_nsec) return -1;
+//     return 0;
+// }
 
 
-void init_attributes(pthread_attr_t * attr, struct sched_param* par, int priority, int scheduler){
-    pthread_attr_init(attr); //inizializzo il thread
-    pthread_attr_setinheritsched(attr, PTHREAD_EXPLICIT_SCHED); //inizializzo la scheduling policy
-    pthread_attr_setschedpolicy(attr, scheduler);
-    par->sched_priority = priority;
-    pthread_attr_setschedparam(attr, par);
-}
 
-
-void init_graphics_task_param(struct task_par *task_parameter){
-task_parameter->arg=telescope_counter;
-task_parameter->period=GRAPHIC_TASK_PERIOD;
-task_parameter->deadline=GRAPHIC_TASK_DEADLINE;
-task_parameter->priority=GRAPHIC_TASK_PRIORITY;
-}
-
-
-void init_planet_task_param(struct task_par *task_parameter){
-  task_parameter->period=TELESCOPE_PERIOD;
-  task_parameter->deadline=TELESCOPE_DEADLINE;
-  task_parameter->priority=TELESCOPE_PRIORITY;
-}
-
-void init_telescope_and_control_task_param(struct task_par *task_parameter,int telescope_number){
-  task_parameter->arg=telescope_counter;
-  task_parameter->period=TELESCOPE_ID;
-  task_parameter->deadline=TELESCOPE_DEADLINE;
-  task_parameter->priority=TELESCOPE_PRIORITY;
-}
-
-
-void init_image_processing_task_param(struct task_par *task_parameter){
-  task_parameter->period=IMAGE_PROCESSING_ID;
-  task_parameter->deadline=IMAGE_PROCESSING_DEADLINE;
-  task_parameter->priority=IMAGE_PROCESSING_PRIORITY;
-}
-
-void init_input_task_param(struct task_par *task_parameter){
-  task_parameter->period=IMAGE_PROCESSING_ID;
-  task_parameter->deadline=IMAGE_PROCESSING_DEADLINE;
-  task_parameter->priority=IMAGE_PROCESSING_PRIORITY;
-}
-
-
-void init_graphic_thread(pthread_t* tracking_id){
-pthread_attr_t      tracking_attr;
-struct sched_param  tracking_par;
-struct task_par*    tracking_task_param;
-
-    tracking_task_param = (struct task_par*)malloc(sizeof(struct task_par));
-    init_tracking_task_param (tracking_task_param, n_tel);
-    init_telescope(n_tel);
-    abp_calculate(n_tel);
-    set_attributes(&tracking_attr, &tracking_par, PLANET_PRIORITY, SCHED_FIFO);
-    pthread_create(tracking_id, &tracking_attr, tracking_task,
-      (void*) tracking_task_param);
-}
-
-//------------------------------------------------------------------------------
-// TRACKING_TASK: function executed by the tracking task
-//------------------------------------------------------------------------------
-
-void* tracking_task(void* str_arg){
-struct task_par* str;
-int x_old, y_old;
-
-    str = (struct task_par*) str_arg;
-    set_period(str);
-
-    while (!esc){
-          x_old = telescope_status[str->arg].x[0];
-          y_old = telescope_status[str->arg].y[0];
-
-          /* calculate the telescope new position*/
-          pthread_mutex_lock(&planet_lock);
-          update_errors_tel(str);
-          pthread_mutex_unlock(&planet_lock);
-
-          pid_calc(str);
-
-          pthread_mutex_lock(&(telescope_lock[str->arg]));
-          motors(str->arg);
-          pthread_mutex_unlock(&(telescope_lock[str->arg]));
-
-          /*draw the telescope in the new position*/
-          pthread_mutex_lock(&screen_lock);
-          rect (screen, x_old, y_old + ACQUISITION_SIDE, x_old + ACQUISITION_SIDE,
-            y_old, black);
-          draw_tel(str->arg);
-          pthread_mutex_unlock(&screen_lock);
-
-          wait_for_period(str);
-          }
-}
-
-
+//
+// void init_attributes(pthread_attr_t * attr, struct sched_param* par, int priority, int scheduler){
+//     pthread_attr_init(attr); //inizializzo il thread
+//     pthread_attr_setinheritsched(attr, PTHREAD_EXPLICIT_SCHED); //inizializzo la scheduling policy
+//     pthread_attr_setschedpolicy(attr, scheduler);
+//     par->sched_priority = priority;
+//     pthread_attr_setschedparam(attr, par);
+//     pthread_attr_setschedpolicy    (&myatt, SCHED_FIFO);
+// }
+//
+//
+// void init_graphics_task_param(struct task_par *task_parameter){
+// task_parameter->arg=telescope_counter;
+// task_parameter->period=GRAPHIC_TASK_PERIOD;
+// task_parameter->deadline=GRAPHIC_TASK_DEADLINE;
+// task_parameter->priority=GRAPHIC_TASK_PRIORITY;
+// }
+//
+//
+// void init_planet_task_param(struct task_par *task_parameter){
+//   task_parameter->period=TELESCOPE_PERIOD;
+//   task_parameter->deadline=TELESCOPE_DEADLINE;
+//   task_parameter->priority=TELESCOPE_PRIORITY;
+// }
+//
+// void init_telescope_and_control_task_param(struct task_par *task_parameter,int telescope_number){
+//   task_parameter->arg=telescope_counter;
+//   task_parameter->period=TELESCOPE_ID;
+//   task_parameter->deadline=TELESCOPE_DEADLINE;
+//   task_parameter->priority=TELESCOPE_PRIORITY;
+// }
+//
+//
+// void init_image_processing_task_param(struct task_par *task_parameter){
+//   task_parameter->period=IMAGE_PROCESSING_ID;
+//   task_parameter->deadline=IMAGE_PROCESSING_DEADLINE;
+//   task_parameter->priority=IMAGE_PROCESSING_PRIORITY;
+// }
+//
+// void init_input_task_param(struct task_par *task_parameter){
+//   task_parameter->period=IMAGE_PROCESSING_ID;
+//   task_parameter->deadline=IMAGE_PROCESSING_DEADLINE;
+//   task_parameter->priority=IMAGE_PROCESSING_PRIORITY;
+// }
+//
+//
+// void init_graphic_thread(pthread_t* tracking_id){
+// pthread_attr_t      tracking_attr;
+// struct sched_param  tracking_par;
+// struct task_par*    tracking_task_param;
+//
+//     tracking_task_param = (struct task_par*)malloc(sizeof(struct task_par));
+//     init_tracking_task_param (tracking_task_param);
+//     // funzione init_attributes
+//
+//     set_attributes(&tracking_attr, &tracking_par, PLANET_PRIORITY, SCHED_FIFO);
+//     pthread_create(tracking_id, &tracking_attr, graphic_task,
+//       (void*) tracking_task_param);
+// }
+//
+// //------------------------------------------------------------------------------
+// // TRACKING_TASK: function executed by the tracking task
+// //------------------------------------------------------------------------------
+//
+// void* graphic_task(void* str_arg){
+// struct task_par* str;
+// int x_old, y_old;
+//
+//     str = (struct task_par*) str_arg;
+//     set_period(str);
+//
+//     while (!esc){
+//           x_old = telescope_status[str->arg].x[0];
+//           y_old = telescope_status[str->arg].y[0];
+//
+//           /* calculate the telescope new position*/
+//           pthread_mutex_lock(&planet_lock);
+//           update_errors_tel(str);
+//           pthread_mutex_unlock(&planet_lock);
+//
+//           pid_calc(str);
+//
+//           pthread_mutex_lock(&(telescope_lock[str->arg]));
+//           motors(str->arg);
+//           pthread_mutex_unlock(&(telescope_lock[str->arg]));
+//
+//           /*draw the telescope in the new position*/
+//           pthread_mutex_lock(&screen_lock);
+//           rect (screen, x_old, y_old + ACQUISITION_SIDE, x_old + ACQUISITION_SIDE,
+//             y_old, black);
+//           draw_tel(str->arg);
+//           pthread_mutex_unlock(&screen_lock);
+//
+//           wait_for_period(str);
+//           }
+// }
+//
+// void *task(void *arg){
+//
+// // <local state variables>
+//
+//
+// int ti;
+// ti = get_task_index(arg);
+// set_activation(ti);
+// while(1)
+//     {
+//
+//     // <task body>
+//
+//     if(deadline_miss(ti)) <do action>;
+//
+//     wait_for_activation(ti);
+//     }
+// }
 
 // COSE DA FARE>
 // 1) INIZIARE A DEFINIRE LE TASK REAL TIME

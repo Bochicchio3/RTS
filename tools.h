@@ -1,3 +1,4 @@
+
 #ifndef TOOLS_H_INCLUDED
 #define TOOLS_H_INCLUDED
 
@@ -53,11 +54,11 @@
 #define PLANET_PERIOD 20
 #define PLANET_PRIORITY 20
 #define PLANET_DEADLINE 10
-//TASK IMAGE_ACQUISITION
-#define IMAGE_ACQUISITION_ID 2
-#define IMAGE_ACQUISITION_PERIOD 20
-#define IMAGE_ACQUISITION_PRIORITY 20
-#define IMAGE_ACQUISITION_DEADLINE 10
+//TASK TELESCOPE
+#define TELESCOPE_ID 2
+#define TELESCOPE_PERIOD 20
+#define TELESCOPE_PRIORITY 20
+#define TELESCOPE_DEADLINE 10
 //TASK IMAGE_PROCESSING
 #define IMAGE_PROCESSING_ID 3
 #define IMAGE_PROCESSING_PERIOD 20
@@ -68,7 +69,11 @@
 #define GRAPHIC_TASK_PERIOD 20
 #define GRAPHIC_TASK_PRIORITY 20
 #define GRAPHIC_TASK_DEADLINE 10
-
+// TASK INPUT
+#define INPUT_ID 5
+#define INPUT_PERIOD 20
+#define INPUT_PRIORITY 20
+#define INPUT_DEADLINE 10
 //DEFINISCO LE STRUTTURE NECESSARIE
 
 struct planet_status {
@@ -77,10 +82,10 @@ int PLANET_POSITION_Y;
 int PLANET_VELOCITY_X;
 int PLANET_VELOCITY_y;
 }  PIANETA_1;
-
-struct sched_param {
-int sched_priority;
-} my_par;
+// 
+// struct sched_param {
+// int sched_priority;
+// } my_par;
 
 struct      task_par {
     int     arg;          // argument of the task
@@ -100,10 +105,23 @@ struct      task_par {
 //
 //
 // }
-void init_graphics_task_param(struct task_par *task_parameter);
-void init_planet_task_param(struct task_par *task_parameter);
-void init_telescope_and_control_task_param(struct task_par *task_parameter,int telescope_number);
-void init_image_processing_task_param(struct task_par *task_parameter);
+// void init_graphics_task_param(struct task_par *task_parameter);
+// void init_image_processing_task_param(struct task_par *task_parameter);
+// void init_telescope_and_control_task_param(struct task_par *task_parameter,int telescope_number);
+// void init_planet_task_param(struct task_par *task_parameter);
+// void init_input_task_param(struct task_par *task_parameter);
+//
+// void init_graphic_thread()
+// void init_image_processing_thread()
+// void init_telescope_and_control_thread()
+// void init_planet_thread()
+// void init_input_thread()
+//
+// void graphic_task()
+// void image_processing_task()
+// void telescope_and_control_task()
+// void planet_task()
+// void input_task()
 
 
 struct telescopes_status{
@@ -121,6 +139,7 @@ struct planet_image{
 int CAMERA_ACQUISITION [CAMERA_ACQUISITION_WIDHT][CAMERA_ACQUISITION_HEIGHT];
 };
 
+// capire perchè typdef, perchè enum e se va bene
 enum BOUNCER_TYPE {
     BT_PLANET
 };
@@ -166,8 +185,6 @@ int time_cmp(struct timespec, struct timespec);
 
 
 
-void init_attributes
-void init_keyboard(pthread_t*)
 
 /*################GLOBAL VARIABLES###########*/
 
@@ -215,8 +232,10 @@ ALLEGRO_BITMAP* PROCESSED_IMAGE_trick;
 unsigned char key[ALLEGRO_KEY_MAX];
 
 
-pthread_t keyboard;
+// pthread_t input_thread;
+
 // provo a creare un thread che aggiorni lo stato del pianeta
+// int pthread_create(thread_t *id, pthread_attr_t *attr,void *(*body)(void*),void *arg);
 
 
 ALLEGRO_EVENT event;
