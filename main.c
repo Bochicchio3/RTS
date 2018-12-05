@@ -22,8 +22,15 @@ int main() {
         ALLEGRO_VERTEX v[4];
         al_clear_to_color(al_map_rgb(0, 0, 0)); //BACKGROUND
 
+
+   
+
+         // pthread_create (&planet,NULL, task, NULL);
+        // IMAGE_ACQUISITION();
+
         draw_task();
         IMAGE_ACQUISITION();
+
 
         // if (a==0)
         // {

@@ -1,3 +1,4 @@
+
 #ifndef TOOLS_H_INCLUDED
 #define TOOLS_H_INCLUDED
 
@@ -5,7 +6,9 @@
 // #include <allegro.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <pthread.h>
+
 #include <math.h>
 #include <time.h>
 #include <stdbool.h>
@@ -54,11 +57,19 @@
 #define PLANET_PERIOD 20
 #define PLANET_PRIORITY 20
 #define PLANET_DEADLINE 10
+
+//TASK TELESCOPE
+#define TELESCOPE_ID 2
+#define TELESCOPE_PERIOD 20
+#define TELESCOPE_PRIORITY 20
+#define TELESCOPE_DEADLINE 10
+
 //TASK IMAGE_ACQUISITION
 #define IMAGE_ACQUISITION_ID 2
 #define IMAGE_ACQUISITION_PERIOD 20
 #define IMAGE_ACQUISITION_PRIORITY 20
 #define IMAGE_ACQUISITION_DEADLINE 10
+
 //TASK IMAGE_PROCESSING
 #define IMAGE_PROCESSING_ID 3
 #define IMAGE_PROCESSING_PERIOD 20
@@ -70,6 +81,12 @@
 #define GRAPHIC_TASK_PRIORITY 20
 #define GRAPHIC_TASK_DEADLINE 10
 
+// TASK INPUT
+#define INPUT_ID 5
+#define INPUT_PERIOD 20
+#define INPUT_PRIORITY 20
+#define INPUT_DEADLINE 10
+
 //DEFINISCO LE STRUTTURE NECESSARIE
 
 struct planet_status {
@@ -78,6 +95,12 @@ int PLANET_POSITION_Y;
 int PLANET_VELOCITY_X;
 int PLANET_VELOCITY_y;
 }  PIANETA_1;
+
+// 
+// struct sched_param {
+// int sched_priority;
+// } my_par;
+
 
 struct      task_par {
     int     arg;          // argument of the task
@@ -98,6 +121,26 @@ struct      task_par {
 //
 // }
 
+// void init_graphics_task_param(struct task_par *task_parameter);
+// void init_image_processing_task_param(struct task_par *task_parameter);
+// void init_telescope_and_control_task_param(struct task_par *task_parameter,int telescope_number);
+// void init_planet_task_param(struct task_par *task_parameter);
+// void init_input_task_param(struct task_par *task_parameter);
+//
+// void init_graphic_thread()
+// void init_image_processing_thread()
+// void init_telescope_and_control_thread()
+// void init_planet_thread()
+// void init_input_thread()
+//
+// void graphic_task()
+// void image_processing_task()
+// void telescope_and_control_task()
+// void planet_task()
+// void input_task()
+
+
+
 struct telescopes_status{
 int telescope_id;
 bool init;
@@ -112,6 +155,7 @@ ALLEGRO_BITMAP* TELESCOPE;
 struct planet_image{
 int CAMERA_ACQUISITION [CAMERA_ACQUISITION_WIDHT][CAMERA_ACQUISITION_HEIGHT];
 };
+
 
 enum BOUNCER_TYPE {
     BT_PLANET
@@ -147,6 +191,8 @@ void PID_controller_telescopes();
 void Get_User_Input();
 void task_param_assignement();
 
+void initialize_planet_and_other_stuff();
+
 
 
 void time_add_ms(struct timespec*, int);
@@ -155,8 +201,6 @@ void set_period(struct task_par*);
 void time_copy(struct timespec*, struct timespec);
 int deadline_miss(struct task_par*);
 int time_cmp(struct timespec, struct timespec);
-
-
 
 /*################GLOBAL VARIABLES###########*/
 
