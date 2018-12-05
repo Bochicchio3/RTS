@@ -40,7 +40,7 @@ void  initialize_graphic_and_keyboard(){
 
     font = al_create_builtin_font();
     must_init(font, "font");
-
+  
     al_start_timer(timer);
 
 
@@ -57,6 +57,7 @@ void  initialize_graphic_and_keyboard(){
     CHANDRA=al_load_bitmap("chandra.jpg");
     HUBBLE=al_load_bitmap("hubble.jpg");
     PROCESSED_IMAGE_trick=al_load_bitmap("rsz_moon.jpg");
+
     al_convert_mask_to_alpha(HUBBLE, al_map_rgb(0,0,0));
     al_convert_mask_to_alpha(BACKGROUND_EARTH, al_map_rgb(0,0,0));
     al_convert_mask_to_alpha(PLANET, al_map_rgb(0,0,0));
@@ -95,7 +96,7 @@ void initialize_planet_and_other_stuff(){
   thispianeta->dy =3;
   thispianeta->type = 0;
   memset(key, 0, sizeof(key));
-  //se possibile evitare??
+
   telescope_selector=1;
 for (int i = 0; i < 6; i++) {
   telescope[i].init=false;
@@ -378,6 +379,7 @@ void Get_User_Input(){
 }
 
 
+
 // //------------------------------------------------------------------------------
 // // TIME_ADD_MS: adds a value ms expressed in milliseconds to the time variable
 // // pointed by t
@@ -582,6 +584,94 @@ void Get_User_Input(){
 //     wait_for_activation(ti);
 //     }
 // }
+=======
+//------------------------------------------------------------------------------
+// TIME_ADD_MS: adds a value ms expressed in milliseconds to the time variable
+// pointed by t
+//------------------------------------------------------------------------------
+
+void time_add_ms(struct timespec *t, int ms){
+
+    t->tv_sec += ms/1000;
+    t->tv_nsec += (ms%1000)*1000000;
+
+    if (t->tv_nsec > 1000000000){
+        t->tv_nsec -= 1000000000;
+        t->tv_sec += 1;
+    }
+}
+
+//------------------------------------------------------------------------------
+// WAIT_FOR_PERIOD:suspends the calling thread until the next activation and,
+// when awaken,updates activation time
+//------------------------------------------------------------------------------
+
+void wait_for_period (struct task_par *tp){
+
+    clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME,&(tp->at), NULL);
+    time_add_ms(&(tp->at), tp->period);
+    time_add_ms(&(tp->dl), tp->period);
+}
+
+
+//------------------------------------------------------------------------------
+// SET_PERIOD: reads the current time and computes the next activation time and
+// the absolute deadline of the task
+//------------------------------------------------------------------------------
+
+void set_period(struct task_par *tp){
+
+struct timespec t;
+
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    time_copy(&(tp->at), t);
+    time_copy(&(tp->dl), t);
+    time_add_ms(&(tp->at), tp->period);
+    time_add_ms(&(tp->dl), tp->deadline);
+}
+
+//------------------------------------------------------------------------------
+// TIME_COPY: copies a source time variable ts in a destination variable
+// pointed by td
+//------------------------------------------------------------------------------
+
+void time_copy(struct timespec *td, struct timespec ts){
+
+    td->tv_sec = ts.tv_sec;
+    td->tv_nsec = ts.tv_nsec;
+}
+
+//------------------------------------------------------------------------------
+// DEADLINE_MISS: increments the value of dmiss when e deadline is missed
+//------------------------------------------------------------------------------
+
+int deadline_miss(struct task_par *tp){
+
+struct timespec now;
+
+    clock_gettime(CLOCK_MONOTONIC, &now);
+
+    if (time_cmp(now, tp->dl)>0) {
+        tp->dmiss++;
+        return 1;
+    }
+    return 0;
+}
+
+//------------------------------------------------------------------------------
+// TIME_CMP: compares two time variables t1 and t2 and returns 0 if
+// they are equal, 1 if t1>t2, -1 if t1<t2
+//------------------------------------------------------------------------------
+
+int time_cmp(struct timespec t1, struct timespec t2){
+
+    if (t1.tv_sec > t2.tv_sec) return 1;
+    if (t1.tv_sec < t2.tv_sec) return -1;
+    if (t1.tv_nsec > t2.tv_nsec) return 1;
+    if (t1.tv_nsec < t2.tv_nsec) return -1;
+    return 0;
+}
+
 
 // COSE DA FARE>
 // 1) INIZIARE A DEFINIRE LE TASK REAL TIME
